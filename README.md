@@ -2,7 +2,7 @@
 
 <img src="public/images/borgfish.png" width="100" alt="Borgfish Logo" />
 
-# 🐟 Borgfish
+# Borgfish 🐟
 
 **Auction-first marketplace for fresh seafood**
 
