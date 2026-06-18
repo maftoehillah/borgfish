@@ -36,4 +36,4 @@ backup-before-reset.bundle
 storage/logs/
 
 # User uploaded files (product photos, packing proofs, etc.)
-/storage/app/public/
+/storage/app/public/"/archive/" 
