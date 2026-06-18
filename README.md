@@ -1,230 +1,225 @@
-# Borgfish — Auction Marketplace (Laravel + Filament)
+<div align="center">
 
-Borgfish is an auction-first marketplace for fresh seafood. This repository demonstrates a production-minded Laravel application combining real-time auction workflows, payment integrations, and notification delivery — packaged as a portfolio project for easy evaluation.
+<img src="https://borgfish.my.id/favicon.ico" width="80" alt="Borgfish Logo" />
 
-**Recruiter Quick Overview**
+# 🐟 Borgfish
 
-# Borgfish — Auction Marketplace (Laravel + Filament)
+**Auction-first marketplace for fresh seafood**
 
-Borgfish is an auction-first marketplace for fresh seafood. This repository contains a production-oriented Laravel application combining real-time auction workflows, payment integrations, and reliable notification delivery — prepared for evaluation and deployment.
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat-square&logo=php&logoColor=white)](https://php.net)
+[![Filament](https://img.shields.io/badge/Filament-Admin-FDBA74?style=flat-square)](https://filamentphp.com)
+[![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
 
-## Live Demo
+[🌐 Live Demo](https://borgfish.my.id) · [📋 Features](#-features) · [⚙️ Setup](#️-quick-start) · [🏗️ Architecture](#️-architecture)
 
-https://borgfish.my.id/
+</div>
 
-**Recruiter Quick Overview**
+---
 
-- **Project Type:** Marketplace / Auction platform (seller → buyer)
-- **Tech:** PHP 8.3 | Laravel 13 | Filament | MySQL | Vite | Tailwind
-- **Auth:** Google OAuth (Socialite) + WhatsApp OTP
-- **Payments:** TriPay — idempotent attempts, HMAC-verified callbacks, reconciliation
-- **Notifications:** WhatsApp (Fonnte / Wablas) via queued outbox
-- **Production Readiness:** Production-capable architecture (scheduler & queues configured); rotate secrets and build `public/build` via CI before publishing.
+## 📖 Overview
 
-## Problem Statement
+Borgfish is a full-stack web marketplace that connects **seafood sellers and buyers** through a transparent, automated auction system. Sellers list fish lots, buyers bid or buy directly, and the platform handles the entire lifecycle — from bid to payment verification to delivery pickup.
 
-Local seafood sellers need a simple, reliable way to auction lots to buyers with transparent payment handling and delivery coordination. Common pain points: inconsistent payment flows, manual reconciliation, and unreliable notification delivery.
+Built to solve real operational pain points for small-to-medium seafood sellers: inconsistent payment flows, manual reconciliation, and unreliable notifications.
 
-## Solution
-
-Borgfish provides a full-stack Laravel solution that automates auction lifecycles, integrates a payment provider (TriPay) with HMAC-verified callbacks, and delivers WhatsApp notifications through an outbox/queue system so sellers and buyers receive reliable updates.
-
-## Feature Highlights
-
-- Google OAuth sign-in with admin whitelist
-- WhatsApp OTP for verification and transactional notifications
+**Key highlights:**
 - Forward & reverse auction engine with anti-sniping support
-- TriPay payment attempts, webhook verification and reconciliation
-- Notification outbox and queued workers for resilient delivery
-- Filament admin UI for managing auctions, settlements, and disputes
+- HMAC-verified payment callbacks via TriPay (QRIS, VA, e-wallet)
+- WhatsApp OTP + Google OAuth authentication
+- Queued notification outbox for reliable delivery
+- Full 6-stage transaction lifecycle with real-time status tracking
+- Filament admin panel for operational management
 
-## Business Flow (Seller → Completion)
+---
 
-1. **Seller** creates a lot (item) and schedules an auction.
-2. **Auction** opens (or scheduled to start) and buyers place bids.
-3. **Bid** activity is tracked; leader/winner is determined at close.
-4. **Payment**: winner pays via TriPay; system records payment attempts and verifies callbacks.
-5. **Packing**: seller prepares item for pickup after payment confirmation.
-6. **Pickup**: logistics partner collects the lot and updates fulfillment state.
-7. **Completion**: buyer confirms receipt; funds are released to the seller and transaction is closed.
+## 🚀 Features
 
-## Technical Highlights
+### For Sellers
+| Feature | Description |
+|---|---|
+| 📦 Lot Upload | Upload fish lots with photos, weight, catch date, packaging type |
+| 📈 Auction Modes | Forward (price up) & Reverse (price down) auction |
+| 💰 Buy Now | Fixed-price option to instantly end an auction |
+| 📊 Dashboard | Summary of active, pending, ending-soon, and completed auctions |
+| 📸 Packing Confirmation | Upload packing proof (photo, location, timestamp) |
+| 🚚 Pickup Validation | Verify driver identity before releasing the lot |
+| 🔔 WhatsApp Notifications | Auto-notified on every status change |
 
-- **Laravel 13**: application core and routing, Eloquent models, jobs, and scheduling.
-- **Filament**: admin interface for operational tasks and monitoring.
-- **MySQL / SQLite**: primary relational storage (MySQL recommended in production).
-- **Google OAuth (Socialite)**: user sign-in and admin whitelist.
-- **TriPay Integration**: create payment, verify HMAC callback, reconcile pending attempts.
-- **WhatsApp OTP (Fonnte / Wablas)**: OTP verification and transactional messages.
-- **Queue Processing**: background workers handle notifications, reconciliation, and long-running tasks.
-- **Scheduler**: cron-driven scheduler manages auction automation and maintenance jobs.
+### For Buyers
+| Feature | Description |
+|---|---|
+| 🛒 Live Marketplace | Browse all active lots with real-time bid counts & countdowns |
+| 🏷️ Lot Detail | Full specs: starting price, increment, buy now price, catch date, bid history |
+| 💸 Bidding | Place bids with minimum increment enforcement |
+| ⚡ Buy Now | Skip the auction at a fixed price |
+| 🏦 Multi-payment | QRIS, BRI/BCA/BNI/Mandiri VA, DANA via TriPay |
+| 📋 Transaction Timeline | 6-stage tracking: Winner → Payment → Packing → Pickup → Done |
+| ⭐ Rating | Rate sellers after receiving the lot |
 
-## Architecture (simple)
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
-	U[User (Browser / Mobile)] -->|HTTP| F[Frontend (Vite + Tailwind)]
-	F -->|API| B[Backend (Laravel 13)]
-	B --> DB[(MySQL / SQLite)]
-	B --> Q[Queue & Workers]
-	B --> S[Storage (public/ S3)]
-	B --> TP[TriPay (Payments)]
-	B --> WA[WhatsApp Provider (Fonnte / Wablas)]
-	F -->|OAuth| G[Google OAuth]
-	Q --> TP
-	Q --> WA
+    U[User Browser / Mobile] -->|HTTP| F[Frontend Blade + Vite + Tailwind]
+    F -->|Routes| B[Backend Laravel 13]
+    B --> DB[(MySQL)]
+    B --> Q[Queue & Workers]
+    B --> S[Storage public / S3]
+    B --> TP[TriPay Payments]
+    B --> WA[WhatsApp Fonnte / Wablas]
+    F -->|OAuth| G[Google OAuth]
+    Q --> TP
+    Q --> WA
 ```
 
-## Why This Project Matters
+**Tech Stack:**
 
-Borgfish targets a real operational gap for small-to-medium seafood sellers who need a reliable auction platform that ties bids to verifiable payments and delivery. By combining payment HMAC verification, queued notifications, and an admin UI for dispute resolution, the project demonstrates practical solutions to trust, automation, and operational scale.
+- **Backend:** Laravel 13, PHP 8.3, Eloquent ORM, Queued Jobs, Scheduler
+- **Frontend:** Blade Templates, Vite, Tailwind CSS, Alpine.js
+- **Database:** MySQL (SQLite for local dev)
+- **Auth:** Google OAuth (Socialite) + WhatsApp OTP
+- **Payments:** TriPay — invoice creation, HMAC callback verification, reconciliation
+- **Notifications:** Fonnte / Wablas WhatsApp API via queued outbox
+- **Admin:** Filament — auction management, settlements, disputes
+- **GPS:** Browser-based coordinate capture for seller store locations
 
-## Future Improvements
+---
 
-- Add GitHub Actions CI workflow: run tests, static analysis (PHPStan) and build assets.
-- Add end-to-end tests (Laravel Dusk / Playwright) and expand unit coverage.
-- Harden security: secrets rotation guide, add `SECURITY.md`, and automated secret scanning in CI.
-- Improve observability: structured logging, metrics, and error reporting (Sentry/Prometheus).
-- Add Docker Compose for consistent local development and a lightweight production image.
-- Consider role-based ACL in Filament and stricter mass-assignment guards on models.
+## 🔄 Transaction Lifecycle
 
-
-## Quick Install (Developer / Local)
-1. Clone the repo:
-
-```bash
-git clone <your-repo-url>
-cd Borgfish
+```
+① Winner Determined
+② Payment Confirmed     ← TriPay HMAC-verified callback
+③ Seller Packs Lot      ← Upload photo proof + location
+④ Pickup Data Sent      ← Buyer submits driver info
+⑤ Pickup Validated      ← Seller verifies driver on-site
+⑥ Transaction Complete  ← Buyer confirms receipt + rating
 ```
 
-2. Ensure PHP, Composer, Node.js are installed (PHP 8.3 recommended).
+All stages emit WhatsApp notifications to both parties automatically.
 
-3. Install PHP dependencies and frontend packages:
+---
+
+## ⚙️ Quick Start
+
+> PHP 8.3, Composer, and Node.js required.
 
 ```bash
+# 1. Clone
+git clone https://github.com/your-username/borgfish.git
+cd borgfish
+
+# 2. Install dependencies
 composer install --prefer-dist --no-interaction
+npm ci && npm run build
+
+# 3. Environment
 cp .env.example .env
 php artisan key:generate
-npm ci
-npm run build
-```
 
-4. Create local database and run migrations + seed (local/test only):
-
-```bash
-# SQLite example
+# 4. Database
 php artisan migrate --seed
 
-# or for MySQL
-php artisan migrate --seed
-```
-
-5. Run local server:
-
-```bash
+# 5. Start
 php artisan serve
 ```
 
-Demo user seeded (local/testing only): `test@example.com` (created by `DatabaseSeeder`). To exercise Google OAuth flows, configure `GOOGLE_CLIENT_*` values (see Environment section).
+### Environment Variables
 
-## Environment Setup
-Edit `.env` (never commit `.env` to git). Minimum values to set:
+Edit `.env` — minimum required:
 
-- `APP_URL` — application URL used for redirects
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`
-- `TRIPAY_*` keys: `TRIPAY_API_KEY`, `TRIPAY_PRIVATE_KEY`, `TRIPAY_MERCHANT_CODE`, and sandbox values
-- `QUEUE_CONNECTION` — recommended `database` for local
-- `FILESYSTEM_DISK=public`
+```env
+APP_URL=http://localhost
 
-See `.env.example` for full list. IMPORTANT: Remove or rotate any secrets if they were committed accidentally.
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=
 
-## Queue Setup
-This app uses queued jobs for notifications and background tasks. Recommended local setup:
+# TriPay Payment Gateway
+TRIPAY_API_KEY=
+TRIPAY_PRIVATE_KEY=
+TRIPAY_MERCHANT_CODE=
+
+# WhatsApp API
+FONNTE_TOKEN=
+
+QUEUE_CONNECTION=database
+FILESYSTEM_DISK=public
+```
+
+See `.env.example` for the full list.
+
+### Queue Worker
 
 ```bash
-php artisan queue:table && php artisan migrate
 php artisan queue:work --sleep=3 --tries=3
 ```
 
-Production: configure Supervisor or systemd to run `php artisan queue:work` as a service.
-
-Example Supervisor unit (Ubuntu):
+Production: use Supervisor to keep the worker alive.
 
 ```ini
 [program:borgfish-queue]
 command=php /path/to/borgfish/artisan queue:work --sleep=3 --tries=3
-process_name=%(program_name)s_%(process_num)02d
-numprocs=1
 autostart=true
 autorestart=true
 user=www-data
 stdout_logfile=/var/log/borgfish-queue.log
-redirect_stderr=true
-environment=APP_ENV="production",APP_DEBUG="false"
 ```
 
-## Scheduler Setup
-Add a cron entry on the host that runs every minute:
+### Scheduler
 
 ```cron
 * * * * * cd /path/to/borgfish && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-Note: scheduled jobs are currently registered in `bootstrap/app.php`.
+---
 
-## Payment Gateway (TriPay) Setup
-1. Set TriPay credentials in `.env` (sandbox credentials for testing).
-2. Configure `TRIPAY_CALLBACK_URL` to `https://your-domain/api/tripay/callback` and ensure route is reachable.
-3. Verify callback signature handling: the app expects HMAC SHA256 callback signature.
+## 🔐 Security
 
-## Deployment Guide
-- Use CI to run tests, static analysis, and build assets (see `.github/workflows/` suggestion in docs).
-- Do not commit `.env`, `public/build`, `vendor/`, or `node_modules/`.
-- Ensure `storage/` and `bootstrap/cache` are writable by web server.
-
-## Demo / Seeded Accounts
-- Local seed: `test@example.com` (created by `DatabaseSeeder` in `local`/`testing` environments).
-- Admin panel: sign in with an admin Google account listed in `ADMIN_GOOGLE_WHITELIST` or create admin via tinker in local.
-
-## Cleaning before publishing (must do)
-1. Remove database dumps and secret files from repo history (CRITICAL):
-
-```bash
-git rm --cached borg_fish.sql .phpunit.result.cache .env public/build
-echo ".env" >> .gitignore
-git add .gitignore
-git commit -m "Remove sensitive artifacts before publishing"
-```
-
-If secrets were previously committed, purge them from history (backup & coordinate with any collaborators):
-
-```bash
-# Make a backup branch
-git branch backup-main
-pip install git-filter-repo
-git filter-repo --invert-paths --path borg_fish.sql --path .env --path .phpunit.result.cache --path public/build
-git push --force origin --all
-git push --force origin --tags
-```
-
-2. Rotate any API keys that were exposed.
-
-## Useful Commands
-- Run tests: `php artisan test`
-- Static analysis (recommended): `vendor/bin/phpstan analyse`
-- Database migrations: `php artisan migrate`
-- Seed db (local): `php artisan db:seed`
-
-## Docs
-- Production queue + scheduler notes: `docs/production-queue-scheduler.md`
-- QA & E2E checklist: `docs/qa-end-to-end-auction.md`
+- Google OAuth + WhatsApp OTP for identity verification
+- Input validation at controller level (price, weight, date, photo rules)
+- Access control: seller operations scoped to lot owner only
+- Media uploads: max 3–4 MB, JPG/PNG/WebP only
+- TriPay callbacks verified via HMAC SHA256
+- Account deletion requires OTP re-verification
 
 ---
-If you want, I can also:
-- Add a CI workflow that runs tests and static analysis.
-- Add `SECURITY.md` and `CONTRIBUTING.md` templates.
-- Remove sensitive files from git history (I can prepare the exact `git-filter-repo` command sequence and perform the edits if you confirm).
+
+## 🧪 Useful Commands
+
+```bash
+php artisan test                    # Run tests
+vendor/bin/phpstan analyse          # Static analysis
+php artisan migrate                 # Run migrations
+php artisan db:seed                 # Seed (local only)
+```
 
 ---
-License: add a license file (MIT recommended) before publishing to GitHub.
 
+## 🛣️ Roadmap
+
+- [ ] GitHub Actions CI — tests, PHPStan, asset build
+- [ ] End-to-end tests (Laravel Dusk / Playwright)
+- [ ] Docker Compose for local development
+- [ ] Structured logging + error tracking (Sentry)
+- [ ] `SECURITY.md` and automated secret scanning
+- [ ] Role-based ACL in Filament
+
+---
+
+## 📄 License
+
+[MIT](LICENSE)
+
+---
+
+<div align="center">
+
+Built by [Sabiq](https://github.com/maftoehillah) · Powered by Laravel 13
+
+</div>
