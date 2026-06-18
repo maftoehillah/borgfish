@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/favicon.ico" width="80" alt="Borgfish Logo" />
+<img src="public/images/borgfish.png" width="100" alt="Borgfish Logo" />
 
 # 🐟 Borgfish
 
