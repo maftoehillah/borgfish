@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Borgfish | Maintenance</title>
+    <style>
+        :root {
+            --p-blue: #0288d1;
+            --p-light: #4fc3f7;
+            --p-gold: #ffc107;
+            --p-glass: rgba(255, 255, 255, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, sans-serif;
+            background: #012a4a;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: fixed;
+        }
+
+        /* --- THE UNDERWATER ENGINE --- */
+        #aquarium {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, #2a6f97 0%, #012a4a 100%);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Sinar Matahari (God Rays) */
+        .rays {
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 180deg at 50% 50%, 
+                transparent 0deg, 
+                rgba(255,255,255,0.05) 10deg, 
+                transparent 20deg, 
+                rgba(255,255,255,0.08) 40deg, 
+                transparent 60deg);
+            animation: raysRotate 60s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes raysRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Partikel Melayang (Plankton/Dust) */
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* --- PREMIUM UI PANEL --- */
+        .ui-panel {
+            position: absolute;
+            bottom: 10%; /* Posisi Tinggi Sempurna untuk Mobile */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 88%;
+            max-width: 420px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .glass-card {
+            background: var(--p-glass);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 40px;
+            padding: 30px 25px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .tag {
+            background: var(--p-gold);
+            color: #5d4037;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 6px 16px;
+            border-radius: 50px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: #fff; letter-spacing: -0.5px; }
+        p { font-size: 0.95rem; color: rgba(255,255,255,0.8); margin-bottom: 25px; line-height: 1.5; }
+
+        .btn-action {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            padding: 18px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(245, 124, 0, 0.4);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-action:active { transform: scale(0.96) translateY(4px); box-shadow: 0 4px 10px rgba(245, 124, 0, 0.2); }
+
+        /* --- FISH & RIPPLES --- */
+        .fish {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+            will-change: transform;
+        }
+
+        .fish-skin {
+            width: 80px; height: 38px;
+            border-radius: 50% 80% 80% 50%;
+            position: relative;
+            background-size: 10px 10px;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Ikan Spesifik */
+        .bandeng .fish-skin { background-color: #b0bec5; border-bottom: 3px solid #78909c; }
+        .mujair .fish-skin { background-color: #546e7a; border-bottom: 3px solid #263238; }
+        .udang .fish-skin { background-color: #ff8a65; width: 45px; height: 16px; border-radius: 20px; }
+
+        .eye { position: absolute; right: 12px; top: 10px; width: 6px; height: 6px; background: #000; border-radius: 50%; border: 1px solid #fff; }
+        
+        .ripple {
+            position: absolute;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: rippleOut 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+            z-index: 5;
+        }
+
+        @keyframes rippleOut {
+            0% { width: 0; height: 0; opacity: 1; border-width: 4px; }
+            100% { width: 250px; height: 250px; opacity: 0; border-width: 1px; }
+        }
+
+        .food-pellet {
+            position: absolute; width: 12px; height: 12px;
+            background: #5d4037; border-radius: 50%;
+            z-index: 6; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="aquarium">
+        <div class="rays"></div>
+        <div id="content-layer"></div>
+    </div>
+
+    <div class="ui-panel">
+        <div class="glass-card">
+            <div class="tag">Maintenance</div>
+            <h1>Kolam sistem sedang dikuras</h1>
+            <p>Tahap jaring ikan Bug</p>
+            <button class="btn-action" id="btn-feed">
+                 TEBAR PAKAN
+            </button>
+        </div>
+    </div>
+
+    <svg style="display:none">
+        <filter id="water-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="1">
+                <animate attributeName="baseFrequency" dur="10s" values="0.02;0.05;0.02" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" scale="5" />
+        </filter>
+    </svg>
+
+    <script>
+        const aquarium = document.getElementById('aquarium');
+        const contentLayer = document.getElementById('content-layer');
+        const btnFeed = document.getElementById('btn-feed');
+        const fishes = [];
+        let foods = [];
+        let touchX = -1000, touchY = -1000, isTouching = false;
+
+        // 1. Dekorasi Partikel (Plankton)
+        for(let i=0; i<20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 4 + 2 + 'px';
+            p.style.width = size; p.style.height = size;
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.opacity = Math.random();
+            aquarium.appendChild(p);
+        }
+
+        // 2. Inisialisasi Ikan Premium
+        const species = ['bandeng', 'mujair', 'udang'];
+        for(let i=0; i<12; i++) {
+            const type = species[Math.floor(Math.random() * species.length)];
+            const div = document.createElement('div');
+            div.className = `fish ${type}`;
+            div.innerHTML = `
+                <div style="position:absolute;left:-15px;top:50%;width:25px;height:25px;background:inherit;clip-path:polygon(100% 50%, 0% 0%, 0% 100%);transform:translateY(-50%);opacity:0.8;"></div>
+                <div class="fish-skin"><div class="eye"></div></div>
+            `;
+            contentLayer.appendChild(div);
+            fishes.push({ 
+                el: div, 
+                x: Math.random() * window.innerWidth, 
+                y: Math.random() * window.innerHeight, 
+                angle: Math.random() * 360, 
+                speed: 1.5 + Math.random(),
+                turnSpeed: (Math.random() - 0.5) * 2
+            });
+        }
+
+        // 3. Sistem Riak Air (Ripples)
+        function spawnRipple(x, y) {
+            const r = document.createElement('div');
+            r.className = 'ripple';
+            r.style.left = x + 'px';
+            r.style.top = y + 'px';
+            contentLayer.appendChild(r);
+            setTimeout(() => r.remove(), 1000);
+        }
+
+        // 4. Touch & Move Handlers
+        const updateTouch = (e) => {
+            const pos = e.touches ? e.touches[0] : e;
+            touchX = pos.clientX;
+            touchY = pos.clientY;
+            if(isTouching) spawnRipple(touchX, touchY);
+        };
+
+        aquarium.addEventListener('touchstart', (e) => { isTouching = true; updateTouch(e); }, {passive:false});
+        aquarium.addEventListener('touchmove', (e) => { updateTouch(e); }, {passive:false});
+        aquarium.addEventListener('mousedown', (e) => { isTouching = true; updateTouch(e); });
+        window.addEventListener('mousemove', (e) => { if(isTouching) updateTouch(e); });
+        window.addEventListener('mouseup', () => { isTouching = false; touchX = -1000; });
+        window.addEventListener('touchend', () => { isTouching = false; touchX = -1000; });
+
+        // 5. Fitur Kasih Makan
+        btnFeed.addEventListener('click', (e) => {
+            e.stopPropagation();
+            for(let i=0; i<6; i++) {
+                const fx = 50 + Math.random() * (window.innerWidth - 100);
+                const fy = 100 + Math.random() * (window.innerHeight - 500);
+                const fEl = document.createElement('div');
+                fEl.className = 'food-pellet';
+                fEl.style.left = fx + 'px'; fEl.style.top = fy + 'px';
+                contentLayer.appendChild(fEl);
+                foods.push({ el: fEl, x: fx, y: fy });
+            }
+        });
+
+        // 6. Game Loop (High Performance)
+        function loop() {
+            fishes.forEach(f => {
+                const dTouch = Math.hypot(touchX - f.x, touchY - f.y);
+
+                if(isTouching && dTouch < 180) {
+                    // Reaksi Kaget (Premium kabur halus)
+                    const targetAngle = Math.atan2(f.y - touchY, f.x - touchX) * 180 / Math.PI;
+                    f.angle += (targetAngle - f.angle) * 0.1;
+                    f.speed = 7;
+                } else if(foods.length > 0) {
+                    // Reaksi Lapar
+                    let target = foods[0];
+                    let minDist = Math.hypot(foods[0].x - f.x, foods[0].y - f.y);
+                    foods.forEach(fd => {
+                        const d = Math.hypot(fd.x - f.x, fd.y - f.y);
+                        if(d < minDist) { minDist = d; target = fd; }
+                    });
+                    const huntAngle = Math.atan2(target.y - f.y, target.x - f.x) * 180 / Math.PI;
+                    f.angle += (huntAngle - f.angle) * 0.1;
+                    f.speed = 4.5;
+                    if(minDist < 25) { target.el.remove(); foods = foods.filter(x => x !== target); }
+                } else {
+                    // Berenang Santai (Bionic Path)
+                    f.speed = f.speed > 1.8 ? f.speed * 0.96 : 1.8;
+                    f.angle += Math.sin(Date.now() * 0.002 + fishes.indexOf(f)) * 1.5;
+                }
+
+                f.x += Math.cos(f.angle * Math.PI / 180) * f.speed;
+                f.y += Math.sin(f.angle * Math.PI / 180) * f.speed;
+
+                // Bounce & Wrap
+                if(f.x < -100) f.x = window.innerWidth + 100;
+                if(f.x > window.innerWidth + 100) f.x = -100;
+                if(f.y < -100) f.y = window.innerHeight + 100;
+                if(f.y > window.innerHeight + 100) f.y = -100;
+
+                f.el.style.transform = `translate(${f.x}px, ${f.y}px) rotate(${f.angle}deg)`;
+            });
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
