@@ -12,7 +12,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind-CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://mysql.com)
 
-[🌐 Live Demo](https://borgfish.my.id) · [📋 Features](#-features) · [⚙️ Setup](#️-quick-start) · [🏗️ Architecture](#️-architecture)
+[🌐 Live Demo](https://borgfish.my.id) · [📋 Features](#-features) · [⚙️ Setup](#️-quick-start) · [🏗️ Architecture](#️-architecture) · [📖 Manual Book](docs/manual-book.pdf)
 
 </div>
 
